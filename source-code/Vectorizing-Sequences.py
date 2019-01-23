@@ -11,7 +11,6 @@ def convert_txt_to_pure_seq(string_seqs):
     pure_seq = list(set(pure_seqs))
     return pure_seq
 
-
 def positive_seq_list():
     f_positive_seq = open('Positive_seqs_with_ref_(101).txt', 'r')
     seq_positive = f_positive_seq.read()
@@ -65,13 +64,49 @@ def litering_oversize_seqs(list_seq):
             litered_seq_list.append(list_seq[i])
     return litered_seq_list
 
+# This several lines produce the
+list_seq_positive = positive_seq_list()
+list_seq_constitutive = constitutive_seq_list()
+list_seq_negative = Negative_seq_list()
+liter_list_seq_positive = litering_oversize_seqs(list_seq_positive)
+liter_list_seq_constitutive = litering_oversize_seqs(list_seq_constitutive)
+liter_list_seq_negative = litering_oversize_seqs(list_seq_negative)
+
 def main_plot_distrbution():
-    list_seq_positive = positive_seq_list()
-    list_seq_constitutive = constitutive_seq_list()
-    list_seq_negative = Negative_seq_list()
-    liter_list_seq_positive = litering_oversize_seqs(list_seq_positive)
-    liter_list_seq_constitutive = litering_oversize_seqs(list_seq_constitutive)
-    liter_list_seq_negative = litering_oversize_seqs(list_seq_negative)
     plot_distrbution_of_seq_len(liter_list_seq_positive, liter_list_seq_constitutive, liter_list_seq_negative)
 
 
+
+
+# This Block transform the survived seqs to numeric vectors
+def one_hot_vectorizing(list_seq):
+    A = [1,0,0,0]
+    G = [0,1,0,0]
+    C = [0,0,1,0]
+    T = [0,0,0,1]
+    vectorized_seq_list = []
+    for j in range(len(list_seq)):
+        vectorized_seq = []
+        for i in range(len(list_seq[j])):
+            if list_seq[j][i] == 'a':
+                vectorized_seq += A
+            elif list_seq[j][i] == 'g':
+                vectorized_seq += G
+            elif list_seq[j][i] == 'c':
+                vectorized_seq += C
+            elif list_seq[j][i] == 't':
+                vectorized_seq += T
+        vectorized_seq_list.append(vectorized_seq)
+    return vectorized_seq_list
+
+
+vectorized_positive_list = one_hot_vectorizing(liter_list_seq_positive)
+vectorized_constitutive_list = one_hot_vectorizing(liter_list_seq_constitutive)
+vectorized_negative_list = one_hot_vectorizing(liter_list_seq_negative)
+
+"""
+print(len(vectorized_negative_list))
+for i in range(len(vectorized_negative_list)):
+    print(vectorized_negative_list[i])
+    print('\n')
+"""
