@@ -248,42 +248,56 @@ def statistics_on_clustering():
     print("percentage of Inducible promoter marked as 1 in all 1= %s percent" % (percentage_indusi_one))
 
 
+def get_seqs_in_smaller_cluster():
+    cluster_1 = []
+    A = [1, 0, 0, 0]
+    G = [0, 1, 0, 0]
+    C = [0, 0, 1, 0]
+    T = [0, 0, 0, 1]
+    for i in range(len(cluster_pred)):
+        if cluster_pred[i] == 1:
+            vectorized_seq = []
+            for j in range(len(Total_seq_list[i])):
+                if Total_seq_list[i][j]== 'a':
+                    vectorized_seq += A
+                elif Total_seq_list[i][j] == 'g':
+                    vectorized_seq += G
+                elif Total_seq_list[i][j] == 'c':
+                    vectorized_seq += C
+                elif Total_seq_list[i][j] == 't':
+                    vectorized_seq += T
+            cluster_1.append(vectorized_seq)
+    return cluster_1
 
-cluster_1 = []
-A = [1, 0, 0, 0]
-G = [0, 1, 0, 0]
-C = [0, 0, 1, 0]
-T = [0, 0, 0, 1]
+
+def get_ref_for_cluster():
+    cluster_1 = get_seqs_in_smaller_cluster()
+    for i in range(len(cluster_1)):
+        for key in dict_positive_numeric.keys():
+            if dict_positive_numeric[key] == cluster_1[i]:
+                print(key)
+                print("positive")
+        for key in dict_constitutive_numeric.keys():
+            if dict_constitutive_numeric[key] == cluster_1[i]:
+                print(key)
+                print("constitutive")
+        for key in dict_negative_numeric.keys():
+            if dict_negative_numeric[key] == cluster_1[i]:
+                print(key)
+                print("negative")
 
 
-for i in range(len(cluster_pred)):
-    if cluster_pred[i] == 1:
-        vectorized_seq = []
-        for j in range(len(Total_seq_list[i])):
-            if Total_seq_list[i][j]== 'a':
-                vectorized_seq += A
-            elif Total_seq_list[i][j] == 'g':
-                vectorized_seq += G
-            elif Total_seq_list[i][j] == 'c':
-                vectorized_seq += C
-            elif Total_seq_list[i][j] == 't':
-                vectorized_seq += T
-        cluster_1.append(vectorized_seq)
 
-
-for i in range(len(cluster_1)):
-    for key in dict_positive_numeric.keys():
-        if dict_positive_numeric[key] == cluster_1[i]:
-            print(cluster_1[i])
-            print(key)
-            print("positive")
-    for key in dict_constitutive_numeric.keys():
-        if dict_constitutive_numeric[key] == cluster_1[i]:
-            print(cluster_1[i])
-            print(key)
-            print("constitutive")
-    for key in dict_negative_numeric.keys():
-        if dict_negative_numeric[key] == cluster_1[i]:
-            print(cluster_1[i])
-            print(key)
-            print("negative")
+def seq_len(seq_list):
+    x = []
+    for i in range(len(seq_list)):
+        x.append(len(seq_list[i])/4)
+    return x
+cluster_1 = get_seqs_in_smaller_cluster()
+len_distribute = seq_len(cluster_1)
+plt.hist(len_distribute ,histtype='stepfilled', alpha=0.6, density=10, bins=40, color="red", label="Positive-regulated promoter")
+plt.ylabel("Frequency/Class Interval")
+plt.xlabel("Length of Sequences")
+#plt.xlim((0,4000))
+plt.title("Distribution of Promoters' Length (Smaller Cluster)")
+plt.show()
