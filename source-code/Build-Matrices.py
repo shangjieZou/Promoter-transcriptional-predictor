@@ -1,6 +1,11 @@
 import numpy as np
 from Try_new_vectoring_method_with_dict import main_convert
 import math
+from sklearn.cluster import KMeans
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
+
 
 
 dict_positive_numeric = main_convert()[0]
@@ -129,3 +134,37 @@ def matrix_G(Diagonal_matrix, Similarity_matirx):
             print("G[%d][%d]=%s" % (i, j, G[i][j]))
     G.tofile("Laplacian_Matrix_G.dat", sep=',')
 
+
+#matrix_G(Diagonal_matrix, Similarity_matrix_S)
+Laplacian_Matrix_G = np.fromfile("Laplacian_Matrix_G.dat", sep=',').reshape((len(Diagonal_matrix),
+                                                                             len(Diagonal_matrix)))
+
+def export_Laplacian_Matrix_G():
+    print(Laplacian_Matrix_G)
+    np.savetxt("Laplacian_Matrix_G.csv", Laplacian_Matrix_G, delimiter=',')
+
+
+def get_eigen_val_vec(Matrix, cluster_nums):
+    eigen_val, eigen_vec = np.linalg.eig(Matrix)
+    dict_Eigenval = dict(zip(eigen_val, range(0, len(eigen_val))))
+    sorted_eigval = np.sort(eigen_val)
+    Lowest_k_eigval = []
+    for i in range(cluster_nums):
+        Lowest_k_eigval.append(sorted_eigval[i])
+    index = []
+    for key in Lowest_k_eigval:
+        index.append(dict_Eigenval[key])
+    Eigen_vec_selected = eigen_vec[:, index]
+    return eigen_val[index], Eigen_vec_selected
+
+cluster_nums = 3
+Eigen_Vector_reduced = get_eigen_val_vec(Laplacian_Matrix_G,cluster_nums)[1]
+
+
+k_means_cluster = KMeans(n_clusters = cluster_nums)
+cluster_pred = k_means_cluster.fit_predict(Eigen_Vector_reduced)
+
+
+plt.scatter(Eigen_Vector_reduced[:,0], Eigen_Vector_reduced[:,1], c = cluster_pred)
+plt.xlim(-0.047673129462278, -0.0476731294622807)
+plt.show()
