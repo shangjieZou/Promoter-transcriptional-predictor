@@ -157,14 +157,133 @@ def get_eigen_val_vec(Matrix, cluster_nums):
     Eigen_vec_selected = eigen_vec[:, index]
     return eigen_val[index], Eigen_vec_selected
 
-cluster_nums = 3
+# cluster_nums = 3
+# cluster_nums = 4
+cluster_nums = 2
 Eigen_Vector_reduced = get_eigen_val_vec(Laplacian_Matrix_G,cluster_nums)[1]
+def export_eigvec():
+    np.savetxt("Eigen_vector.csv", Eigen_Vector_reduced, delimiter=',')
 
 
 k_means_cluster = KMeans(n_clusters = cluster_nums)
 cluster_pred = k_means_cluster.fit_predict(Eigen_Vector_reduced)
 
 
-plt.scatter(Eigen_Vector_reduced[:,0], Eigen_Vector_reduced[:,1], c = cluster_pred)
-plt.xlim(-0.047673129462278, -0.0476731294622807)
-plt.show()
+# When hoping to get 2D fig, change 0 to 1
+def two_dim_plot():
+    plt.scatter(Eigen_Vector_reduced[:,0], Eigen_Vector_reduced[:,1], c = cluster_pred)
+    plt.xlim(-0.047673129462278, -0.0476731294622807)
+    plt.legend()
+    plt.show()
+
+
+def three_dim_plot():
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.scatter(Eigen_Vector_reduced[:,0],Eigen_Vector_reduced[:,1],
+               Eigen_Vector_reduced[:, 2], c = cluster_pred)
+    plt.xlim(-0.047673129462278, -0.0476731294622807)
+    ax.view_init(elev=10, azim=235)
+    plt.show()
+
+
+def find_out_strange_point():
+    print(cluster_pred)
+    print(type(cluster_pred))
+    np.savetxt("cluster_pred.csv", cluster_pred, delimiter=',')
+
+
+
+
+
+# Filter oversize seqs
+def find_oversize(dict1, dict2, dict3, threshold_size):
+    for key in dict1.keys():
+        if len(dict1[key])> threshold_size * 4:
+            print(key)
+    for key in dict2.keys():
+        if len(dict2[key]) > threshold_size * 4:
+            print(key)
+    for key in dict3.keys():
+        if len(dict3[key]) > threshold_size * 4:
+            print(key)
+
+
+list_index_for_category = []
+for i in range(len(Total_seq_list)):
+    if i>=125 and i<=214:
+        list_index_for_category.append("Constitutive")
+    else:
+        list_index_for_category.append("Inducible")
+
+
+def statistics_on_clustering():
+    Total_zero, Total_one, Total_constitutive_zero, Total_iducible_zero,\
+    Total_constitutive_one, Total_iducible_one= 0,0,0,0,0,0
+    for i in range(len(list_index_for_category)):
+        if cluster_pred[i] == 0:
+            Total_zero += 1
+            if list_index_for_category[i] == "Constitutive":
+                Total_constitutive_zero += 1
+            else:
+                Total_iducible_zero += 1
+
+        else:
+            Total_one += 1
+            if list_index_for_category[i] == "Constitutive":
+                Total_constitutive_one += 1
+            else:
+                Total_iducible_one += 1
+    percentage_Consti_zero = (Total_constitutive_zero/Total_zero)*100
+    percentage_indusi_zero = (Total_iducible_zero/Total_zero)*100
+    percentage_Consti_one = (Total_constitutive_one / Total_one) * 100
+    percentage_indusi_one = (Total_iducible_one / Total_one) * 100
+    print("The Total number of Constitutive promoter marked as 0 is " + str(Total_constitutive_zero))
+    print("The Total number of Indusible promoter marked as 0 is " + str(Total_iducible_zero))
+    print("percentage of Constitutive promoter marked as 0 in all 0= %s percent" % (percentage_Consti_zero))
+    print("percentage of Inducible promoter marked as 0 in all 0= %s percent" % (percentage_indusi_zero))
+    print("The Total number of Constitutive promoter marked as 1 is " + str(Total_constitutive_one))
+    print("The Total number of Indusible promoter marked as 1 is " + str(Total_iducible_one))
+    print("percentage of Constitutive promoter marked as 1 in all 1= %s percent" % (percentage_Consti_one))
+    print("percentage of Inducible promoter marked as 1 in all 1= %s percent" % (percentage_indusi_one))
+
+
+
+cluster_1 = []
+A = [1, 0, 0, 0]
+G = [0, 1, 0, 0]
+C = [0, 0, 1, 0]
+T = [0, 0, 0, 1]
+
+
+for i in range(len(cluster_pred)):
+    if cluster_pred[i] == 1:
+        vectorized_seq = []
+        for j in range(len(Total_seq_list[i])):
+            if Total_seq_list[i][j]== 'a':
+                vectorized_seq += A
+            elif Total_seq_list[i][j] == 'g':
+                vectorized_seq += G
+            elif Total_seq_list[i][j] == 'c':
+                vectorized_seq += C
+            elif Total_seq_list[i][j] == 't':
+                vectorized_seq += T
+        cluster_1.append(vectorized_seq)
+
+
+for i in range(len(cluster_1)):
+    for key in dict_positive_numeric.keys():
+        if dict_positive_numeric[key] == cluster_1[i]:
+            print(cluster_1[i])
+            print(key)
+            print("positive")
+    for key in dict_constitutive_numeric.keys():
+        if dict_constitutive_numeric[key] == cluster_1[i]:
+            print(cluster_1[i])
+            print(key)
+            print("constitutive")
+    for key in dict_negative_numeric.keys():
+        if dict_negative_numeric[key] == cluster_1[i]:
+            print(cluster_1[i])
+            print(key)
+            print("negative")
