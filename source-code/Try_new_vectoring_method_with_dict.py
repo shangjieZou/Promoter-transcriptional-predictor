@@ -96,6 +96,34 @@ def main_convert():
     dict_constitutive_numeric = one_hot_vectorizing(dict_seq_constitutive)
     dict_negative_numeric = one_hot_vectorizing(dict_seq_negative)
 
+
+    def plot_distrbution_of_seq_filtered(dict_positive_numeric, dict_constitutive_numeric, dict_negative_numeric):
+        def accumulate_seq_len(dict_seq):
+            x = []
+            for value in dict_seq.values():
+                if len(value) <= 500 * 4:
+                    # positive = 89, constitutive = 83, negative = 203
+                    x.append(len(value) / 4)
+            return x
+
+        x_positive = accumulate_seq_len(dict_positive_numeric)
+        print(len(x_positive))
+        x_constitutive = accumulate_seq_len(dict_constitutive_numeric)
+        print(len(x_constitutive))
+        x_negative = accumulate_seq_len(dict_negative_numeric)
+        print(len(x_negative))
+        plt.hist(x_positive, histtype='stepfilled', alpha=0.4, density=10, bins=40, color="navy",
+                 label="Positive-regulated promoter")
+        plt.hist(x_constitutive, histtype='stepfilled', alpha=0.4, density=10, bins=40, color="green",
+                 label="Constitutive promoter")
+        plt.hist(x_negative, histtype='stepfilled', alpha=0.4, density=10, bins=40, color="darkgoldenrod",
+                 label="Repressible promoter")
+        plt.ylabel("Frequency/Class Interval")
+        plt.xlabel("Length of Sequences")
+        # plt.xlim((0,4000))
+        plt.title("Distribution of Promoters' Length")
+        plt.legend()
+        plt.show()
     """
     for key in dict_positive_numeric.keys():
         print(key)
