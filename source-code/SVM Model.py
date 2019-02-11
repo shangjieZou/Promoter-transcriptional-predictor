@@ -3,6 +3,8 @@ import numpy as np
 from sklearn.model_selection import cross_val_score,train_test_split
 from sklearn import svm
 import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
@@ -95,17 +97,17 @@ def optimizing_C():
 
 def optimizing_gamma():
     C = 10
-    gamma = 0.01
+    gamma = 0.001
     list_gamma = []
     list_acc = []
-    while gamma<10:
+    while gamma<1.0:
         predictive_model = svm.SVC(C=C, kernel='rbf', gamma= gamma)
         predictive_model.fit(train_X, train_y)
-        acc_cross = cross_val_score(predictive_model, test_X, test_y, cv = 7, scoring="accuracy")
-        acc = sum(acc_cross)/7
+        prediction = predictive_model.predict(test_X)
+        Accuracy = accuracy_score(prediction, test_y)
         list_gamma.append(gamma)
-        list_acc.append(acc)
-        gamma += 0.01
+        list_acc.append(Accuracy)
+        gamma += 0.001
     print(list_gamma)
     print(list_acc)
     max_acc = max(list_acc)
@@ -121,16 +123,75 @@ def optimizing_gamma():
     plt.show()
 
 
+def optimizing_gamma_C():
+    C = 0
+    list_gamma = []
+    list_acc = []
+    list_C = []
+    while C<35:
+        C += 0.5
+        gamma = 0.001
+        while gamma<0.5:
+            predictive_model = svm.SVC(C=C, kernel='rbf', gamma= gamma)
+            predictive_model.fit(train_X, train_y)
+            prediction = predictive_model.predict(test_X)
+            Accuracy = accuracy_score(prediction, test_y)
+            list_gamma.append(gamma)
+            list_C.append(C)
+            list_acc.append(Accuracy)
+            gamma += 0.001
+            print("finished gamma = %s, C = %s"%(gamma, C))
+    print(list_gamma)
+    print(list_C)
+    print(list_acc)
+    max_acc = max(list_acc)
+    dict_training_gamma = dict(zip(list_acc, list_gamma))
+    dict_training_C = dict(zip(list_acc, list_C))
+    max_gamma = dict_training_gamma[max_acc]
+    max_C = dict_training_C[max_acc]
+    print("max_gamma = "+str(max_gamma))
+    print("max_C = "+str(max_C))
+    print("max_acc = " + str(max_acc))
 
 
 def try_svm_optimized_para():
     C = 10
-    gamma = 0.05
-    predictive_model = svm.SVC(C=C, kernel='rbf', gamma= gamma)
-    predictive_model.fit(train_X, train_y)
-    acc_cross = cross_val_score(predictive_model, test_X, test_y, cv = 7, scoring="accuracy")
+    gamma = 0.015
+    predictive_model = svm.SVC(C=C, kernel='rbf', gamma = gamma)
+    acc_cross = cross_val_score(predictive_model, X, y, cv = 7, scoring="accuracy")
+    print(acc_cross)
     acc = sum(acc_cross)/7
     print("acc = " + str(acc))
+
+
+def Hold_out():
+    C = 10
+    gamma = 0.05
+    predictive_model = svm.SVC(C=C, kernel='rbf', gamma=gamma)
+    predictive_model.fit(train_X, train_y)
+    prediction = predictive_model.predict(test_X)
+    Accuracy = accuracy_score(prediction, test_y)
+    print(Accuracy)  # 0.88
+
+
+def cross_validation_K_fold():
+    # k-fold
+    C = 10
+    gamma = 0.015
+    for i in range(2,11):
+        kf = KFold(n_splits=i, shuffle = True)
+        predictive_model = svm.SVC(C=C, kernel='rbf', gamma=gamma)
+        Accuracy_stack = 0
+        for train, test in kf.split(X):
+            predictive_model = predictive_model.fit(X[train], y[train])
+            prediction = predictive_model.predict(X[test])
+            Accuracy_by_module = accuracy_score(y[test],prediction)
+            print(Accuracy_by_module)
+            Accuracy_stack += Accuracy_by_module
+        average_acc_by_module = Accuracy_stack/i
+        print("%d fold cross validation"%(i))
+        print("average_acc_by_module=" + str(average_acc_by_module))
+
 
 
 """
