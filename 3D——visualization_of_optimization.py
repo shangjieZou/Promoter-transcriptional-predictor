@@ -5,41 +5,40 @@ import matplotlib.pyplot as plt
 f = open("list_optimized_acc.txt", "r")
 str_optimizing_acc = f.read()
 list_acc = str_optimizing_acc.split(",")
-acc_array = np.array(list_acc)
+Acc_array = np.array(list_acc)
 
-if(1):
-    C_array = np.zeros((1, 70))
-    gamma_array = np.zeros((1,499))
-    for i in range(len(C_array[0, ])):
-        C_array[0,i] = (i+1) * 0.5
-    for i in range(len(gamma_array[0,])):
-        gamma_array[0,i] = (i+1) * 0.001
 
-    acc_array = acc_array.reshape((70,499))
+C_array = np.zeros((1, 70))
+gamma_array = np.zeros((1,499))
+for i in range(len(C_array[0, ])):
+    C_array[0,i] = (i+1) * 0.5
+for i in range(len(gamma_array[0,])):
+    gamma_array[0,i] = (i+1) * 0.001
 
-if(0):
-    C_array = np.zeros((1, len(acc_array)))
-    gamma_array = np.zeros((1, len(acc_array)))
-    temp = 0
-    for i in range(len(C_array[0,])):
-        if i % 499 ==0:
-            temp += 0.5
-        C_array[0, i] = temp
-    for i in range(len(gamma_array[0,])):
-        if i % 499 == 0:
-            gamma_array[0, i] = 0.001
-        else:
-            k = i % 499
-            gamma_array[0, i] = 0.001 + k * 0.001
-
+acc_array = np.zeros((len(gamma_array[0,]),len(C_array[0,])))
+for i in range(len(gamma_array[0,])):
+    for j in range(len(C_array[0,])):
+        acc_array[i][j] = Acc_array[i+j]
+        #print("acc_array[%d][%d] = %s" %(i,j, acc_array[i][j]))
+#print(acc_array)
 
 fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-X = C_array
-Y = gamma_array
+ax = plt.axes(projection='3d')
+X = C_array[0,:]
+Y = gamma_array[0,:]
+plt.xlabel("Parameter C")
+plt.ylabel("Parameter gamma")
+ax.set_zlabel('Prediction accuracy')
 X,Y = np.meshgrid(X,Y)
 Z = acc_array
-ax.plot_surface(X, Y, Z,cmap='rainbow')
+surf = ax.plot_surface(X, Y, Z, cmap = "coolwarm")
+ax.contour(X,Y,Z,zdir='z', offset=-3,cmap="coolwarm")
 # ax.scatter(X, Y, Z, c = 'blue')
+#ax.plot_wireframe(X, Y, Z)
+ax.view_init(elev=30, azim=200)
+fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.show()
+
+# ValueError: shape mismatch: objects cannot be broadcast to a single shape
+# 注意z的数据的z.shape是(len(y), len(x))
 
