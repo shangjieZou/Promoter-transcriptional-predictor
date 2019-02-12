@@ -8,50 +8,20 @@ list_acc = str_optimizing_acc.split(",")
 Acc_array = np.array(list_acc)
 
 
-if(0):
-    C_array = np.zeros((1, 70))
-    gamma_array = np.zeros((1,499))
-    for i in range(len(C_array[0, ])):
-        C_array[0,i] = (i+1) * 0.5
-    for i in range(len(gamma_array[0,])):
-        gamma_array[0,i] = (i+1) * 0.001
+C_array = np.zeros((1, 70))
+gamma_array = np.zeros((1,499))
+for i in range(len(C_array[0, ])):
+    C_array[0,i] = (i+1) * 0.5
+for i in range(len(gamma_array[0,])):
+    gamma_array[0,i] = (i+1) * 0.001
 
-    acc_array = np.zeros((len(gamma_array[0,]),len(C_array[0,])))
-    for i in range(len(gamma_array[0,])):
-        for j in range(len(C_array[0,])):
-            acc_array[i][j] = Acc_array[i+j]
-            #print("acc_array[%d][%d] = %s" %(i,j, acc_array[i][j]))
-    #print(acc_array)
+acc_array = np.zeros((len(gamma_array[0,]),len(C_array[0,])))
+for i in range(len(gamma_array[0,])):
+    for j in range(len(C_array[0,])):
+        acc_array[i][j] = Acc_array[i+j]
+        #print("acc_array[%d][%d] = %s" %(i,j, acc_array[i][j]))
+#print(acc_array)
 
-
-
-if(0):
-    C_array = np.zeros((1, len(acc_array)))
-    gamma_array = np.zeros((1, len(acc_array)))
-    temp = 0
-    for i in range(len(C_array[0,])):
-        if i % 499 ==0:
-            temp += 0.5
-        C_array[0, i] = temp
-    for i in range(len(gamma_array[0,])):
-        if i % 499 == 0:
-            gamma_array[0, i] = 0.001
-        else:
-            k = i % 499
-            gamma_array[0, i] = 0.001 + k * 0.001
-
-if(1):
-    C_array = np.zeros((1, 70))
-    gamma_array = np.zeros((1,499))
-    for i in range(len(C_array[0, ])):
-        C_array[0,i] = (i+1) * 0.5
-    for i in range(len(gamma_array[0,])):
-        gamma_array[0,i] = (i+1) * 0.001
-
-    acc_array = np.zeros((len(gamma_array[0,]),len(C_array[0,])))
-    for i in range(len(gamma_array[0,])):
-        for j in range(len(C_array[0,])):
-            acc_array[i][j] = Acc_array[i+j]
 fig = plt.figure()
 ax = plt.axes(projection='3d')
 X = C_array[0,:]
